@@ -54,11 +54,9 @@ class InsertInfoIntoUsers(Users):
 
     def inserting_new_unique_users(self, message):
         """
-        Добавление нового пользователья когда он первый раз запускает бота
-        :param message:
-        :return:
+        Inserting unique new user into the database
         """
-        user_telegram_id = message.from_user.id
+        user_telegram_id = message.chat.id
         is_bot = message.from_user.is_bot
         first_name = message.from_user.first_name
         username = message.from_user.username
@@ -79,8 +77,12 @@ class GettingInfoFromUsers(Users):
     def __init__(self):
         super().__init__()
 
-    def get_all_information_by_message_id(self, user_id):
-        self.cursor.execute('''SELECT * FROM users_unique WHERE user_telegram_id =?''', (user_id,))
-        result = self.cursor.fetchall()
+    def is_user_registrated(self, user_id: str) -> bool:
+        self.cursor.execute('''SELECT user_table_id FROM users_unique WHERE user_telegram_id =?''', (user_id,))
+        result = self.cursor.fetchone()
         self.close()
-        return result
+
+        if result is not None:
+            return True
+        else:
+            return False
